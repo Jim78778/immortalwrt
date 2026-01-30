@@ -57,7 +57,7 @@ define Device/swaiot_cpe_s10
     
     # 直接指定 FIT 构建命令，确保设备树被包含
     KERNEL = kernel-bin | gzip | fit gz $$(DTS_DIR)/$$(DEVICE_DTS).dtb
-    KERNEL_NAME := zImage
+    KERNEL_NAME := Image
     KERNEL_LOADADDR := 0x41000000
     KERNEL_ENTRY_POINT := 0x41000000
     

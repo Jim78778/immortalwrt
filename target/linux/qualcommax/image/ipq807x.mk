@@ -46,8 +46,8 @@ define Device/swaiot_cpe_s10
   DEVICE_VENDOR := Swaiot
   DEVICE_MODEL := CPE-S10
   DEVICE_VARIANT := NAND
-  SOC := ipq807x
-  DEVICE_DTS := ipq8071-s10
+  SOC := ipq8071
+  DEVICE_DTS := qcom/ipq8071-s10
   
   # NAND 参数
   BLOCKSIZE := 128k

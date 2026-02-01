@@ -41,33 +41,35 @@ define Build/zyxel-nwa210ax-fit
 endef
 
 define Device/swaiot_cpe_s10
-  $(call Device/UbiFit)
-  
+  $(call Device/Default)
+
   DEVICE_VENDOR := Swaiot
   DEVICE_MODEL := CPE-S10
   DEVICE_VARIANT := NAND
+
   SOC := ipq8071
-  DEVICE_DTS := ipq8071-s10
-  
+  DEVICE_DTS := ipq8071-s10-sky
+
   # NAND 参数
   BLOCKSIZE := 128k
   PAGESIZE := 2048
-  KERNEL_IN_UBI := 1
-  
-  # 内核配置
-  KERNEL = kernel-bin | lzma | fit lzma $$(DTS_DIR)/$$(DEVICE_DTS).dtb
+
+  # 普通 kernel（不生成 FIT）
+  KERNEL = kernel-bin | lzma
   KERNEL_NAME := Image
-  KERNEL_LOADADDR := 0x41000000
-  KERNEL_ENTRY_POINT := 0x41000000
-  
-  # UBI 配置（根据实际分区大小调整）
-  IMAGE_SIZE := 110592k  # 108MB
-  KERNEL_SIZE := 16384k  # 16MB
-  
+  DEVICE_KERNEL_LOADADDR := 0x41000000
+  DEVICE_KERNEL_ENTRY := 0x41000000
+
+  # UBI / sysupgrade
+  KERNEL_IN_UBI := 1
+  IMAGE_SIZE := 110592k
+  KERNEL_SIZE := 16384k
+
   IMAGE/sysupgrade.bin := sysupgrade-ubi | append-metadata
 endef
 
 TARGET_DEVICES += swaiot_cpe_s10
+
 
 
 define Device/aliyun_ap8220

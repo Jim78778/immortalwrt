@@ -16,8 +16,8 @@
 	aliases {
 		serial0 = &blsp1_uart3;
 		ethernet0 = &dp5; /* WAN - 2.5G */
-		ethernet1 = &dp1; /* LAN1 - 1G */
-		ethernet2 = &dp2; /* LAN2 - 1G */
+		ethernet1 = &dp3; /* LAN1 - 1G */
+		ethernet2 = &dp4; /* LAN2 - 1G */
 	};
 
 	chosen {
@@ -27,7 +27,7 @@
 
 	memory@40000000 {
 		device_type = "memory";
-		reg = <0x0 0x40000000 0x0 0x40000000>; /* 1GB */
+		reg = <0x00 0x40000000 0x00 0x80000000>; /* 2GB */
 	};
 
 	keys {
@@ -399,7 +399,7 @@
 };
 
 /* LAN1 - 1G */
-&dp1 {
+&dp3 {
 	status = "okay";
 	phy-mode = "qsgmii";
 	phy-handle = <&qca8075_1>;
@@ -407,7 +407,7 @@
 };
 
 /* LAN2 - 1G */
-&dp2 {
+&dp4 {
 	status = "okay";
 	phy-mode = "qsgmii";
 	phy-handle = <&qca8075_2>;

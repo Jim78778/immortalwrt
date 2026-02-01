@@ -10,18 +10,18 @@
 #include <dt-bindings/leds/common.h>
 
 / {
-	model = "Swaiot / Skyworth CPE-S10";
-	compatible = "swaiot,cpe-s10", "qcom,ipq8074";
+	model = "Swaiot CPE-S10-SKY";
+	compatible = "swaiot,cpe-s10-sky", "qcom,ipq8074-ap-ac02", "qcom,ipq8074";
 
 	aliases {
 		serial0 = &blsp1_uart3;
 		ethernet0 = &dp5; /* WAN - 2.5G */
 		ethernet1 = &dp3; /* LAN1 - 1G */
 		ethernet2 = &dp4; /* LAN2 - 1G */
-		led-boot = &led_system_blue;
-		led-failsafe = &led_system_red;
-		led-running = &led_system_blue;
-		led-upgrade = &led_system_blue;
+		led-boot = &led_red;
+		led-failsafe = &led_red;
+		led-running = &led_blue;
+		led-upgrade = &led_blue;
 	};
 
 	chosen {
@@ -31,7 +31,7 @@
 
 	memory@40000000 {
 		device_type = "memory";
-		reg = <0x00 0x40000000 0x00 0x80000000>; /* 2GB */
+		reg = <0x0 0x40000000 0x0 0x80000000>; /* 2GB */
 	};
 
 	keys {
@@ -57,66 +57,82 @@
 
 		/* 4G indicators */
 		led_4g_yellow: led_4g_yellow {
-			label = "4gyellow";
+			label = "yellow:4g";
 			gpios = <&tlmm 42 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
 		led_4g_blue: led_4g_blue {
-			label = "4gblue";
+			label = "blue:4g";
 			gpios = <&tlmm 43 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
 		/* System indicators */
-		led_system_blue: led_system_blue {
-			label = "blue";
-			gpios = <&tlmm 51 GPIO_ACTIVE_LOW>;
-			default-state = "keep";
+		led_red: led_red {
+			label = "red:system";
+			gpios = <&tlmm 51 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
 		};
 
-		led_system_red: led_system_red {
-			label = "red";
-			gpios = <&tlmm 52 GPIO_ACTIVE_LOW>;
-			default-state = "off";
+		led_blue: led_blue {
+			label = "blue:system";
+			gpios = <&tlmm 52 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
 		};
 
 		/* Ethernet indicators */
 		led_eth_blue: led_eth_blue {
-			label = "ethblue";
-			gpios = <&tlmm 55 GPIO_ACTIVE_LOW>;
+			label = "blue:ethernet";
+			gpios = <&tlmm 55 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
 		led_eth_yellow: led_eth_yellow {
-			label = "ethyellow";
-			gpios = <&tlmm 56 GPIO_ACTIVE_LOW>;
+			label = "yellow:ethernet";
+			gpios = <&tlmm 56 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
 		/* 5G indicators */
 		led_5g_blue: led_5g_blue {
-			label = "5gblue";
+			label = "blue:5g";
 			gpios = <&tlmm 63 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
 		led_5g_yellow: led_5g_yellow {
-			label = "5gyellow";
+			label = "yellow:5g";
 			gpios = <&tlmm 64 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 	};
 
+	/* MAC地址配置 */
 	nvmem-layout {
 		compatible = "fixed-layout";
 		
+		/* WiFi校准数据 */
 		precal_art_1000: precal@1000 {
 			reg = <0x1000 0x2f20>;
 		};
 		
+		/* MAC地址 - 从原始DTS看，偏移0x1002 */
 		macaddr_art_1002: macaddr@1002 {
 			reg = <0x1002 0x6>;
+			compatible = "mac-base";
+			#nvmem-cell-cells = <1>;
+		};
+		
+		/* 可能还有更多MAC地址偏移 */
+		macaddr_art_1008: macaddr@1008 {
+			reg = <0x1008 0x6>;
+			compatible = "mac-base";
+			#nvmem-cell-cells = <1>;
+		};
+		
+		macaddr_art_100e: macaddr@100e {
+			reg = <0x100e 0x6>;
 			compatible = "mac-base";
 			#nvmem-cell-cells = <1>;
 		};
@@ -145,13 +161,13 @@
 			pins = "gpio58";
 			function = "pcie0_rst";
 			drive-strength = <8>;
-			bias-pull-up;
+			bias-pull-down;
 		};
 		pcie0_wake {
 			pins = "gpio59";
 			function = "pcie0_wake";
 			drive-strength = <8>;
-			bias-pull-up;
+			bias-pull-down;
 		};
 	};
 
@@ -160,13 +176,13 @@
 			pins = "gpio61";
 			function = "pcie1_rst";
 			drive-strength = <8>;
-			bias-pull-up;
+			bias-pull-down;
 		};
 		pcie1_wake {
 			pins = "gpio62";
 			function = "pcie1_wake";
 			drive-strength = <8>;
-			bias-pull-up;
+			bias-pull-down;
 		};
 	};
 };
@@ -201,155 +217,38 @@
 			#address-cells = <1>;
 			#size-cells = <1>;
 
-			/* 0. rootfs - 250MB */
+			/* 根文件系统 */
 			partition@0 {
 				label = "ubi";
 				reg = <0x00000000 0x0fa00000>;
 			};
 
-			/* 1. 0:SBL1 - 320KB */
+			/* 保留分区 */
 			partition@fa00000 {
-				label = "0:SBL1";
-				reg = <0x0fa00000 0x00050000>;
+				label = "reserved";
+				reg = <0x0fa00000 0x00600000>;
 				read-only;
 			};
 
-			/* 2. 0:MIBIB - 64KB */
-			partition@fa50000 {
-				label = "0:MIBIB";
-				reg = <0x0fa50000 0x00010000>;
+			/* ART分区 - 校准数据包含MAC地址 */
+			partition@10000000 {
+				label = "art";
+				reg = <0x10000000 0x00100000>;
 				read-only;
-			};
 
-			/* 3. 0:BOOTCONFIG - 128KB */
-			partition@fa60000 {
-				label = "0:BOOTCONFIG";
-				reg = <0x0fa60000 0x00020000>;
-				read-only;
-			};
-
-			/* 4. 0:BOOTCONFIG1 - 128KB */
-			partition@fa80000 {
-				label = "0:BOOTCONFIG1";
-				reg = <0x0fa80000 0x00020000>;
-				read-only;
-			};
-
-			/* 5. 0:QSEE - 1.5MB */
-			partition@faa0000 {
-				label = "0:QSEE";
-				reg = <0x0faa0000 0x00180000>;
-				read-only;
-			};
-
-			/* 6. 0:QSEE_1 - 1.5MB */
-			partition@fc20000 {
-				label = "0:QSEE_1";
-				reg = <0x0fc20000 0x00180000>;
-				read-only;
-			};
-
-			/* 7. 0:DEVCFG - 64KB */
-			partition@fda0000 {
-				label = "0:DEVCFG";
-				reg = <0x0fda0000 0x00010000>;
-				read-only;
-			};
-
-			/* 8. 0:DEVCFG_1 - 64KB */
-			partition@fdb0000 {
-				label = "0:DEVCFG_1";
-				reg = <0x0fdb0000 0x00010000>;
-				read-only;
-			};
-
-			/* 9. 0:APDP - 64KB */
-			partition@fdc0000 {
-				label = "0:APDP";
-				reg = <0x0fdc0000 0x00010000>;
-				read-only;
-			};
-
-			/* 10. 0:APDP_1 - 64KB */
-			partition@fdd0000 {
-				label = "0:APDP_1";
-				reg = <0x0fdd0000 0x00010000>;
-				read-only;
-			};
-
-			/* 11. 0:RPM - 256KB */
-			partition@fde0000 {
-				label = "0:RPM";
-				reg = <0x0fde0000 0x00040000>;
-				read-only;
-			};
-
-			/* 12. 0:RPM_1 - 256KB */
-			partition@fe20000 {
-				label = "0:RPM_1";
-				reg = <0x0fe20000 0x00040000>;
-				read-only;
-			};
-
-			/* 13. 0:CDT - 64KB */
-			partition@fe60000 {
-				label = "0:CDT";
-				reg = <0x0fe60000 0x00010000>;
-				read-only;
-			};
-
-			/* 14. 0:CDT_1 - 64KB */
-			partition@fe70000 {
-				label = "0:CDT_1";
-				reg = <0x0fe70000 0x00010000>;
-				read-only;
-			};
-
-			/* 15. 0:APPSBLENV - 64KB */
-			partition@fe80000 {
-				label = "0:APPSBLENV";
-				reg = <0x0fe80000 0x00010000>;
-				read-only;
-			};
-
-			/* 16. 0:APPSBL - 640KB */
-			partition@fe90000 {
-				label = "0:APPSBL";
-				reg = <0x0fe90000 0x000a0000>;
-				read-only;
-			};
-
-			/* 17. 0:APPSBL_1 - 640KB */
-			partition@ff30000 {
-				label = "0:APPSBL_1";
-				reg = <0x0ff30000 0x000a0000>;
-				read-only;
-			};
-
-			/* 18. 0:ART - 256KB */
-			partition@ffd0000 {
-				label = "0:ART";
-				reg = <0x0ffd0000 0x00040000>;
-				read-only;
-			};
-
-			/* 19. 0:ETHPHYFW - 512KB */
-			partition@10010000 {
-				label = "0:ETHPHYFW";
-				reg = <0x10010000 0x00080000>;
-				read-only;
-			};
-
-			/* 20. ledeinfo - 64KB */
-			partition@10090000 {
-				label = "ledeinfo";
-				reg = <0x10090000 0x00010000>;
-			};
-
-			/* 21. reserve - 64KB */
-			partition@100a0000 {
-				label = "reserve";
-				reg = <0x100a0000 0x00010000>;
+				nvmem-layout {
+					compatible = "fixed-layout";
+					
+					precal_art_1000: precalibration@1000 {
+						reg = <0x1000 0x2f20>;
+					};
+					
+					macaddr_art_1002: macaddr@1002 {
+						reg = <0x1002 0x6>;
+						compatible = "mac-base";
+						#nvmem-cell-cells = <1>;
+					};
+				};
 			};
 		};
 	};
@@ -395,14 +294,14 @@
 		qcom,package-mode = "qsgmii";
 
 		/* 1G PHYs for LAN ports */
-		qca8075_1: ethernet-phy@0 {
+		qca8075_1: ethernet-phy@2 {
 			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <0>;
+			reg = <2>;
 		};
 
-		qca8075_2: ethernet-phy@1 {
+		qca8075_2: ethernet-phy@3 {
 			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <1>;
+			reg = <3>;
 		};
 
 		/* 2.5G PHY for WAN port */
@@ -436,13 +335,13 @@
 	switch_mac_mode1 = <MAC_MODE_SGMII_PLUS>; /* mac mode for uniphy instance1 */
 
 	qcom,port_phyinfo {
-		port@1 {
-			port_id = <1>;
-			phy_address = <0>;
+		port@3 {
+			port_id = <3>;
+			phy_address = <2>;
 		};
-		port@2 {
-			port_id = <2>;
-			phy_address = <1>;
+		port@4 {
+			port_id = <4>;
+			phy_address = <3>;
 		};
 		port@5 {
 			port_id = <5>;
@@ -459,20 +358,20 @@
 /* LAN1 - 1G */
 &dp3 {
 	status = "okay";
-	phy-mode = "qsgmii";
+	phy-mode = "sgmii";
 	phy-handle = <&qca8075_1>;
 	label = "lan1";
-	nvmem-cells = <&macaddr_art_1002 1>;
+	nvmem-cells = <&macaddr_art_1002 2>;
 	nvmem-cell-names = "mac-address";
 };
 
 /* LAN2 - 1G */
 &dp4 {
 	status = "okay";
-	phy-mode = "qsgmii";
+	phy-mode = "sgmii";
 	phy-handle = <&qca8075_2>;
 	label = "lan2";
-	nvmem-cells = <&macaddr_art_1002 2>;
+	nvmem-cells = <&macaddr_art_1002 3>;
 	nvmem-cell-names = "mac-address";
 };
 
@@ -482,7 +381,7 @@
 	phy-mode = "sgmii";
 	phy-handle = <&qca8081>;
 	label = "wan";
-	nvmem-cells = <&macaddr_art_1002 0>;
+	nvmem-cells = <&macaddr_art_1002 1>;
 	nvmem-cell-names = "mac-address";
 };
 
@@ -496,7 +395,7 @@
 	pinctrl-names = "default";
 	perst-gpios = <&tlmm 58 GPIO_ACTIVE_LOW>;
 	wake-gpios = <&tlmm 59 GPIO_ACTIVE_LOW>;
-	// Likely for WiFi
+	/* 用于WiFi */
 };
 
 &pcie1 {
@@ -505,18 +404,28 @@
 	pinctrl-names = "default";
 	perst-gpios = <&tlmm 61 GPIO_ACTIVE_LOW>;
 	wake-gpios = <&tlmm 62 GPIO_ACTIVE_LOW>;
-	// Likely for 5G module
+	/* 用于5G模块 */
 };
 
+/* WiFi配置 - 根据原始DTS，设备有多个WiFi芯片 */
 &wifi {
 	status = "okay";
-	qcom,ath11k-calibration-variant = "cpe_s10_sky";
-	qcom,ath11k-fw-memory-mode = <1>;
-	nvmem-cells = <&precal_art_1000>, <&macaddr_art_1002 3>;
-	nvmem-cell-names = "pre-calibration", "mac-address";
-	ieee80211-freq-limit = <2400000 2500000>;
 	
+	/* 第一个WiFi芯片 (2.4GHz) */
 	wifi0: wifi@0 {
 		status = "okay";
+		qcom,ath11k-calibration-variant = "cpe-s10-sky";
+		nvmem-cells = <&precal_art_1000>, <&macaddr_art_1002 0>;
+		nvmem-cell-names = "pre-calibration", "mac-address";
+		ieee80211-freq-limit = <2400000 2500000>;
+	};
+	
+	/* 第二个WiFi芯片 (5GHz) */
+	wifi1: wifi@1 {
+		status = "okay";
+		qcom,ath11k-calibration-variant = "cpe-s10-sky";
+		nvmem-cells = <&precal_art_1000>, <&macaddr_art_1008 0>;
+		nvmem-cell-names = "pre-calibration", "mac-address";
+		ieee80211-freq-limit = <4900000 5900000>;
 	};
 };

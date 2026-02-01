@@ -48,7 +48,7 @@ define Device/swaiot_cpe_s10
   DEVICE_VARIANT := NAND
 
   SOC := ipq8074
-  DEVICE_DTS := ipq8074-s10-sky
+  DEVICE_DTS := ipq8074-s10
 
   # NAND 参数
   BLOCKSIZE := 128k

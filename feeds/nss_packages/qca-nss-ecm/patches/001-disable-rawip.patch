@@ -1,5 +1,0 @@
---- a/Makefile
-+++ b/Makefile
-@@ -67,7 +67,7 @@ ECM_INTERFACE_PPP_ENABLE ?= y
--ECM_INTERFACE_RAWIP_ENABLE ?= y
-+ECM_INTERFACE_RAWIP_ENABLE ?= n

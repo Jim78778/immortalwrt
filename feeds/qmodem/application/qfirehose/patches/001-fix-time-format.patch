@@ -1,11 +1,11 @@
 --- a/qfirehose.c
 +++ b/qfirehose.c
-@@ -412,7 +412,7 @@ int main(int argc, char *argv[])
- 				struct stat st = {0};
- 
- 				/* Create directory if it doesn't exist */
--				snprintf(filename, sizeof(filename), "%.80s/qfirehose_%lu.log", optarg, time(NULL));
-+				snprintf(filename, sizeof(filename), "%.80s/qfirehose_%llu.log", optarg, (unsigned long long)time(NULL));
- 
- 				if (stat(optarg, &st) == -1) {
- 					if (mkdir(optarg, 0755) == -1) {
+@@ -412,7 +412,9 @@ int main(int argc, char **argv)
+         if (optarg) {
+             char filename[PATH_MAX];
+-            snprintf(filename, sizeof(filename), "%.80s/qfirehose_%lu.log", optarg, time(NULL));
++            snprintf(filename, sizeof(filename),
++                     "%.80s/qfirehose_%lld.log",
++                     optarg, (long long)time(NULL));
+             logfp = fopen(filename, "w");
+         }

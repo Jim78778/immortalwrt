@@ -138,7 +138,7 @@
 };
 
 /* ================= WiFi (ath11k 主线 / ImmortalWrt) ================= */
-&wifi_pci0 {
+&pcie0 {
 	status = "okay";
 
 	qcom,ath11k-calibration-variant = "cpe-s10-sky";
@@ -146,7 +146,7 @@
 	nvmem-cell-names = "pre-calibration", "mac-address";
 };
 
-&wifi_pci1 {
+&pcie1 {
 	status = "okay";
 
 	qcom,ath11k-calibration-variant = "cpe-s10-sky";

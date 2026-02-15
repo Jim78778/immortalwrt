@@ -329,7 +329,7 @@
 &wifi {
 	status = "okay";
 	qcom,ath11k-fw-memory-mode = <1>;
-	qcom,ath11k-calibration-variant = "Swaiot-CPE-S10-SKY";
+	qcom,ath11k-calibration-variant = "Aliyun-AP8220";
 	/* 如果有校准数据，可以添加 */
 	/* nvmem-cells = <&precal_art>; */
 	/* nvmem-cell-names = "pre-calibration"; */

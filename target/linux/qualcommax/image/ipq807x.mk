@@ -53,16 +53,17 @@ define Device/swaiot_cpe_s10
 
     BLOCKSIZE := 128k
     PAGESIZE := 2048
+
     IMAGE_SIZE := 250m
 
     KERNEL_IN_UBI := 1
-    IMAGES := sysupgrade.bin
-    IMAGE/sysupgrade.bin := append-kernel | pad-to 2M | append-ubi | check-size $(IMAGE_SIZE)
+
+    IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 
     DEVICE_PACKAGES := ipq-wifi-aliyun_ap8220
 endef
-TARGET_DEVICES += swaiot_cpe_s10
 
+TARGET_DEVICES += swaiot_cpe_s10
 
 
 define Device/aliyun_ap8220

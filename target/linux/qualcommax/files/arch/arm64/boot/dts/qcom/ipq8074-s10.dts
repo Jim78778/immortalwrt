@@ -343,14 +343,3 @@
 	wake-gpios = <&tlmm 59 GPIO_ACTIVE_HIGH>;
 };
 &pcie1 { status = "okay"; };
-
-/* ===== 保留 QSDK 必需节点 ===== */
-&qcom_rng { status = "okay"; };
-&qcom_see { status = "okay"; };
-&q6v5_wcss { status = "okay"; };
-&cryptobam { status = "okay"; };
-&crypto { status = "okay"; };
-&prng { status = "okay"; };
-&blsp1_dma { status = "okay"; };
-&blsp2_dma { status = "okay"; };
-&gcc { status = "okay"; };

@@ -56,7 +56,7 @@ define Device/swaiot_cpe_s10
 
     IMAGE_SIZE := 250m
 
-    KERNEL_IN_UBI := 1
+    KERNEL_IN_UBI := 0
 
     IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 

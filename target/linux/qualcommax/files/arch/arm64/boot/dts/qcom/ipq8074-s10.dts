@@ -145,104 +145,81 @@
 
 /* ===== SPI NOR (原厂分区，ART在此) ===== */
 &blsp1_spi1 {
+	pinctrl-0 = <&spi_0_pins>;
+	pinctrl-names = "default";
+	cs-select = <0>;
 	status = "okay";
 
 	flash@0 {
 		compatible = "jedec,spi-nor";
-		spi-max-frequency = <50000000>;
-		reg = <0>;
 		#address-cells = <1>;
 		#size-cells = <1>;
+		reg = <0>;
+		spi-max-frequency = <50000000>;
 
 		partitions {
 			compatible = "fixed-partitions";
 			#address-cells = <1>;
 			#size-cells = <1>;
 
-			partition@0 { label = "0:SBL1"; reg = <0x00000 0x50000>; read-only; };
-			partition@50000 { label = "0:MIBIB"; reg = <0x50000 0x10000>; read-only; };
-			partition@60000 { label = "0:BOOTCONFIG"; reg = <0x60000 0x20000>; read-only; };
-			partition@80000 { label = "0:BOOTCONFIG1"; reg = <0x80000 0x20000>; read-only; };
-			partition@a0000 { label = "0:QSEE"; reg = <0xa0000 0x180000>; read-only; };
-			partition@220000 { label = "0:QSEE_1"; reg = <0x220000 0x180000>; read-only; };
-			partition@3a0000 { label = "0:DEVCFG"; reg = <0x3a0000 0x10000>; read-only; };
-			partition@3b0000 { label = "0:DEVCFG_1"; reg = <0x3b0000 0x10000>; read-only; };
-			partition@3c0000 { label = "0:APDP"; reg = <0x3c0000 0x10000>; read-only; };
-			partition@3d0000 { label = "0:APDP_1"; reg = <0x3d0000 0x10000>; read-only; };
-			partition@3e0000 { label = "0:RPM"; reg = <0x3e0000 0x40000>; read-only; };
-			partition@420000 { label = "0:RPM_1"; reg = <0x420000 0x40000>; read-only; };
-			partition@460000 { label = "0:CDT"; reg = <0x460000 0x10000>; read-only; };
-			partition@470000 { label = "0:CDT_1"; reg = <0x470000 0x10000>; read-only; };
-			partition@480000 { label = "0:APPSBLENV"; reg = <0x480000 0x10000>; };
-			partition@490000 { label = "0:APPSBL"; reg = <0x490000 0xa0000>; read-only; };
-			partition@530000 { label = "0:APPSBL_1"; reg = <0x530000 0xa0000>; read-only; };
-			
-			/* ART 分区 - 256KB (mtd18) - 存放 MAC 地址和校准数据 */
-			partition@5d0000 {
-				label = "0:ART";
-				reg = <0x5d0000 0x40000>;
-				read-only;
-
-				nvmem-layout {
-					compatible = "fixed-layout";
-					#address-cells = <1>;
-					#size-cells = <1>;
-
-					/* MAC 地址基址，支持偏移 */
-					macaddr_art: macaddr@1002 {
-						reg = <0x1002 0x6>;
-						compatible = "mac-base";
-						#nvmem-cell-cells = <1>;
-					};
-
-					/* WiFi 校准数据（如果需要） */
-					precal_art: precal@1000 {
-						reg = <0x1000 0x2f20>;
-					};
-				};
-			};
-
-			partition@610000 { label = "0:ETHPHYFW"; reg = <0x610000 0x80000>; read-only; };
-			partition@690000 { label = "ledeinfo"; reg = <0x690000 0x10000>; };
-			partition@6a0000 { label = "reserve"; reg = <0x6a0000 0x10000>; };
+			partition@0 { label = "0:SBL1"; reg = <0x00000 0x50000>; };
+			partition@1 { label = "0:MIBIB"; reg = <0x50000 0x10000>; };
+			partition@2 { label = "0:BOOTCONFIG"; reg = <0x60000 0x20000>; };
+			partition@3 { label = "0:BOOTCONFIG1"; reg = <0x80000 0x20000>; };
+			partition@4 { label = "0:QSEE"; reg = <0xa0000 0x180000>; };
+			partition@5 { label = "0:QSEE_1"; reg = <0x220000 0x180000>; };
+			partition@6 { label = "0:DEVCFG"; reg = <0x3a0000 0x100000>; };
+			partition@7 { label = "0:DEVCFG_1"; reg = <0x3b0000 0x100000>; };
+			partition@8 { label = "0:APDP"; reg = <0x3c0000 0x100000>; };
+			partition@9 { label = "0:APDP_1"; reg = <0x3d0000 0x100000>; };
+			partition@10 { label = "0:RPM"; reg = <0x3e0000 0x40000>; };
+			partition@11 { label = "0:RPM_1"; reg = <0x420000 0x40000>; };
+			partition@12 { label = "0:CDT"; reg = <0x460000 0x100000>; };
+			partition@13 { label = "0:CDT_1"; reg = <0x470000 0x100000>; };
+			partition@14 { label = "0:APPSBLENV"; reg = <0x480000 0x100000>; };
+			partition@15 { label = "0:APPSBL"; reg = <0x490000 0x100000>; };
+			partition@16 { label = "0:APPSBL_1"; reg = <0x530000 0x100000>; };
+			partition@17 { label = "0:ETHPHYFW"; reg = <0x610000 0x80000>; };
+			partition@18 { label = "0:ART"; reg = <0x5d0000 0x40000>; read-only; };
+			partition@19 { label = "ledeinfo"; reg = <0x690000 0x10000>; };
+			partition@20 { label = "reserve"; reg = <0x6a0000 0x10000>; };
 		};
 	};
 };
 
-/* ===== QPIC NAND (核心存储 - 仅 UBI) ===== */
 &qpic_nand {
 	status = "okay";
 
 	nand@0 {
 		reg = <0>;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		nand-bus-width = <8>;
-		/* Micron MT29F2G08ABBGAH4 需要 4-bit ECC */
-		nand-ecc-strength = <4>;
+		nand-ecc-strength = <8>;
 		nand-ecc-step-size = <512>;
+		nand-bus-width = <8>;
 
 		partitions {
 			compatible = "fixed-partitions";
 			#address-cells = <1>;
 			#size-cells = <1>;
 
-			/* UBI 主分区 - 250MB (OpenWrt 标准 rootfs 分区名) */
-			partition@0 {
-				label = "rootfs";
-				reg = <0x00000000 0x0fa00000>;
-			};
+			partition@0 { label = "rootfs"; reg = <0x00000000 0x0fa00000>; };
 		};
 	};
 };
 
-/* ===== USB ===== */
+&blsp1_uart5 { status = "okay"; };
+&cryptobam { status = "okay"; };
+&crypto { status = "okay"; };
+&prng { status = "okay"; };
+&qpic_bam { status = "okay"; };
+
 &qusb_phy_0 { status = "okay"; };
 &qusb_phy_1 { status = "okay"; };
 &ssphy_0 { status = "okay"; };
 &ssphy_1 { status = "okay"; };
+
 &usb_0 { status = "okay"; };
 &usb_1 { status = "okay"; };
+
 
 /* ===== MDIO & PHY ===== */
 &mdio {

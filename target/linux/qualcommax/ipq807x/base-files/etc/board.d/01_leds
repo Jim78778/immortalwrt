@@ -11,6 +11,24 @@ edgecore,eap102)
 	ucidef_set_led_netdev "wlan2g" "WLAN2G" "2g:status" "phy1-ap0"
 	ucidef_set_led_netdev "wlan5g" "WLAN5G" "5g:status" "phy0-ap0"
 	;;
+swaiot,cpe-s10-sky)
+    # 系统灯（纯 netdev）
+    ucidef_set_led_netdev "system-blue" "System-Blue" "blue" "lan" "tx rx"
+    ucidef_set_led_netdev "system-red"  "System-Red"  "red"  "lan" "tx rx"
+
+    # 4G
+    ucidef_set_led_netdev "4g-yellow" "4G-Yellow" "4gyellow" "wwan0" "tx rx"
+    ucidef_set_led_netdev "4g-blue"   "4G-Blue"   "4gblue"   "wwan0" "tx rx"
+
+    # 5G
+    ucidef_set_led_netdev "5g-blue"   "5G-Blue"   "5gblue"   "wwan1" "tx rx"
+    ucidef_set_led_netdev "5g-yellow" "5G-Yellow" "5gyellow" "wwan1" "tx rx"
+
+    # WAN 端口 PHY 灯（2.5G）
+    ucidef_set_led_netdev "wan-port" "WAN-Port" \
+        "90000.mdio-1:18:ethblue" "wan" \
+        "tx rx link_10 link_100 link_1000 link_2500"
+    ;;
 arcadyan,aw1000)
 	ucidef_set_led_netdev "5g" "5G" "green:5g" "wwan0"
 	ucidef_set_led_netdev "wan" "WAN" "green:internet" "wan"

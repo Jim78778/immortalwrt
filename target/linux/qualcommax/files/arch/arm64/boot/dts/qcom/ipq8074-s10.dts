@@ -1,18 +1,20 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
-/* Swaiot CPE-S10-SKY | LibWrt 6.12.94 V2 DTS */
+/* Swaiot CPE-S10-SKY | LibWrt 25.12-nss Linux6.12 V4.1 */
 /dts-v1/;
 #include "ipq8074.dtsi"
-#include "ipq8074-hk-cpu.dtsi"
 #include "ipq8074-ess.dtsi"
 #include "ipq8074-nss.dtsi"
+#include "ipq8074-hk-cpu.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/leds/common.h>
+
 / {
 	model = "Swaiot CPE-S10-SKY";
-	compatible = "swaiot,cpe-s10-sky",  "qcom,ipq8074" , "qcom,ipq8074-hk09";
-        qcom,msm-id = <0x178 0x0>;
-        qcom,board-id = <0x08 0x0>;
+	compatible = "swaiot,cpe-s10-sky", "qcom,ipq8074-ap-ac02", "qcom,ipq8074";
+	qcom,msm-id = <0x178 0x0>;
+	qcom,board-id = <0x08 0x0>;
+
 	aliases {
 		serial0 = &blsp1_uart5;
 		ethernet0 = &dp5_syn;
@@ -24,14 +26,17 @@
 		led-upgrade  = &led_top_red;
 		label-mac-device = &dp5_syn;
 	};
+
 	chosen {
-                stdout-path = "serial0:115200n8";
-                bootargs-append = " root=/dev/ubiblock0_1 swiotlb=1 coherent_pool=2M";
-        };
+		stdout-path = "serial0:115200n8";
+		bootargs-append = " swiotlb=256 coherent_pool=2M";
+	};
+
 	memory@40000000 {
 		device_type = "memory";
 		reg = <0x0 0x40000000 0x0 0x80000000>;
 	};
+
 	keys {
 		compatible = "gpio-keys";
 		pinctrl-0 = <&button_pins>;
@@ -55,6 +60,7 @@
 			debounce-interval = <60>;
 		};
 	};
+
 	leds {
 		compatible = "gpio-leds";
 		pinctrl-0 = <&led_pins>;
@@ -73,6 +79,7 @@
 		led_wifi_yellow: wifi-yellow { label = "yellow:wifi"; gpios = <&tlmm 56 GPIO_ACTIVE_HIGH>; };
 	};
 };
+
 &tlmm {
 	button_pins: button-pins {
 		pins = "gpio25", "gpio34", "gpio50";
@@ -87,7 +94,7 @@
 		drive-strength = <8>;
 		bias-pull-down;
 	};
-        mdio_pins: mdio-pins {
+	mdio_pins: mdio-pins {
 		mdc {
 			pins = "gpio68";
 			function = "mdc";
@@ -101,7 +108,7 @@
 			bias-pull-up;
 		};
 	};
-        spi_0_pins_s10: spi-0-pins-s10 {
+	spi_0_pins_s10: spi-0-pins-s10 {
 		pins = "gpio38", "gpio39", "gpio40", "gpio41";
 		function = "blsp0_spi";
 		drive-strength = <8>;
@@ -111,7 +118,7 @@
 		pins = "gpio59";
 		function = "pcie0_wake";
 		drive-strength = <8>;
-		bias-pull-down;
+		bias-pull-up;
 	};
 	pcie0_sdx_pins: pcie0-sdx-pins {
 		sdx_pon {
@@ -148,12 +155,14 @@
 		};
 	};
 };
+
 &blsp1_uart3 { status = "disabled"; };
 &blsp1_uart5 { status = "okay"; };
 &cryptobam { status = "okay"; };
 &crypto    { status = "okay"; };
 &prng      { status = "okay"; };
 &qpic_bam  { status = "okay"; };
+
 &blsp1_spi1 {
 	status = "okay";
 	pinctrl-0 = <&spi_0_pins_s10>;
@@ -195,9 +204,6 @@
 					precal_art_1000: precal@1000 {
 						reg = <0x1000 0x2f20>;
 					};
-					qmi_boardid_1000: qmi-boardid@1000 {
-						reg = <0x1000 0x4>;
-					};
 					macaddr_lan1:   macaddr@1002 { reg = <0x1002 0x6>; };
 					macaddr_wan:    macaddr@100e { reg = <0x100e 0x6>; };
 					macaddr_wifi5:  macaddr@1014 { reg = <0x1014 0x6>; };
@@ -210,14 +216,16 @@
 		};
 	};
 };
-&qusb_phy_0 { status = "okay"; };
-&qusb_phy_1 { status = "okay"; };
-&ssphy_0 { status = "okay"; };
-&ssphy_1 { status = "okay"; };
-&usb_0 { status = "okay"; };
-&usb_1 { status = "okay"; };
+
+&qusb_phy_0 { status = "disabled"; };
+&ssphy_0 { status = "disabled"; };
+&usb_0 { status = "disabled"; };
+&qusb_phy_1 { status = "disabled"; };
+&ssphy_1 { status = "disabled"; };
+&usb_1 { status = "disabled"; };
+
 &qpic_nand {
-	status = "okay";
+	status = "disabled";
 	nand@0 {
 		reg = <0>;
 		nand-bus-width = <8>;
@@ -234,6 +242,8 @@
 		};
 	};
 };
+
+/* QCA8075 + QCA8081 MDIO 完整定义，补齐PHY4 */
 &mdio {
 	status = "okay";
 	pinctrl-0 = <&mdio_pins>;
@@ -260,45 +270,56 @@
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <3>;
 		};
+		qca8075_4: ethernet-phy@4 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reg = <4>;
+		};
 	};
 	qca8081_24: ethernet-phy@24 {
 		compatible = "ethernet-phy-id004d.d101";
 		reg = <24>;
-		reset-assert-us = <100000>;
-		reset-deassert-us = <500000>;
+		reset-deassert-us = <10000>;
 		reset-gpios = <&tlmm 48 GPIO_ACTIVE_LOW>;
 		qcom,phy-led-mode = <1>;
-		eee-broken;
 	};
 };
+
 &switch {
 	status = "okay";
 	switch_lan_bmp = <(ESS_PORT3 | ESS_PORT4)>;
 	switch_wan_bmp = <ESS_PORT5>;
-	switch_mac_mode = <MAC_MODE_QSGMII>;
+	switch_mac_mode  = <MAC_MODE_QSGMII>;
 	switch_mac_mode1 = <MAC_MODE_SGMII_PLUS>;
 	switch_mac_mode2 = <MAC_MODE_SGMII_PLUS>;
 	qcom,port_phyinfo {
-		port@3 {
+		port@0 {
+			port_id = <1>;
+			phy_address = <0>;
+		};
+		port@1 {
+			port_id = <2>;
+			phy_address = <1>;
+		};
+		port@2 {
 			port_id = <3>;
 			phy_address = <2>;
 		};
-		port@4 {
+		port@3 {
 			port_id = <4>;
 			phy_address = <3>;
 		};
-		port@5 {
+		port@4 {
 			port_id = <5>;
 			phy_address = <24>;
 			port_mac_sel = "QGMAC_PORT";
 		};
 	};
 };
-&edma {
-	status = "okay";
-};
+
+&edma { status = "okay"; };
 &dp1 { status = "disabled"; };
 &dp2 { status = "disabled"; };
+
 &dp3 {
 	status = "okay";
 	phy-mode = "qsgmii";
@@ -318,12 +339,20 @@
 };
 &dp5_syn {
 	status = "okay";
-	phy-mode = "usxgmii";
+	phy-mode = "sgmii";
 	phy-handle = <&qca8081_24>;
 	label = "wan";
 	nvmem-cells = <&macaddr_wan>;
 	nvmem-cell-names = "mac-address";
 };
+
+&ess {
+	/delete-property/ mac-address;
+	nvmem-cells = <&macaddr_lan1>;
+	nvmem-cell-names = "mac-address";
+};
+
+/* PCIe0 for T99W373 */
 &pcie_qmp0 {
 	status = "okay";
 };
@@ -331,17 +360,19 @@
 	status = "okay";
 	pinctrl-0 = <&pcie0_sdx_pins>, <&pcie0_wake_pins>;
 	pinctrl-names = "default";
-	perst-gpios = <&tlmm 58 GPIO_ACTIVE_LOW>;
+	perst-gpios = <&tlmm 58 GPIO_ACTIVE_HIGH>;
 };
-&pcie_qmp1 {
-	status = "disabled";
+
+&pcie_qmp1 { status = "disabled"; };
+&pcie1     { status = "disabled"; };
+
+&wifi0 {
+	/delete-property/ mac-address;
+	nvmem-cells = <&macaddr_wifi5>;
+	nvmem-cell-names = "mac-address";
 };
-&pcie1 {
-	status = "disabled";
-};
-&wifi {
-    status = "okay";
-    qcom,qmi-board-id = <&qmi_boardid_1000>;
-    nvmem-cell-names = "caldata";
-    nvmem-cells = <&precal_art_1000>;
+&wifi1 {
+	/delete-property/ mac-address;
+	nvmem-cells = <&macaddr_wifi24>;
+	nvmem-cell-names = "mac-address";
 };

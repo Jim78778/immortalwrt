@@ -49,7 +49,7 @@ define Device/swaiot_cpe_s10
 
     SOC := ipq8074
     DEVICE_DTS := ipq8074-s10
-    DEVICE_DTS_CONFIG := config@hk01
+    DEVICE_DTS_CONFIG := config@ac02
 
     BLOCKSIZE := 128k
     PAGESIZE := 2048
